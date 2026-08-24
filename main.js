@@ -12,6 +12,7 @@ const admirationLetterFirst = document.querySelector("[data-admiration-letter-fi
 const admirationLetterSecond = document.querySelector("[data-admiration-letter-second]");
 const admirationLetterWrap = document.querySelector("[data-admiration-letter-wrap]");
 const memoriesScene = document.querySelector("[data-memories-scene]");
+const blankScene = document.querySelector("[data-blank-scene]");
 const tiltedTiles = document.querySelector("[data-tilted-tiles]");
 const tiltedPlane = document.querySelector("[data-tilted-plane]");
 
@@ -146,6 +147,7 @@ const preloadMemoryImages = () => {
 };
 
 let tiltedTilesStarted = false;
+let galleryTransitionStarted = false;
 
 const startTiltedTiles = () => {
   if (!tiltedTiles || !tiltedPlane || tiltedTilesStarted) return;
@@ -211,6 +213,12 @@ const startTiltedTiles = () => {
   let lastTimestamp = null;
   let initialBeta = null;
   let initialGamma = null;
+  let speedMultiplier = 1;
+  let targetSpeedMultiplier = 1;
+
+  tiltedTiles.addEventListener("tilted-tiles-rush", () => {
+    targetSpeedMultiplier = 14;
+  });
 
   tiltedTiles.addEventListener("pointermove", (event) => {
     if (reduced || event.pointerType === "touch") return;
@@ -254,6 +262,7 @@ const startTiltedTiles = () => {
     const delta = Math.min(0.05, Math.max(0, timestamp - lastTimestamp) / 1000);
     lastTimestamp = timestamp;
     const damping = 1 - Math.exp(-delta / 0.14);
+    speedMultiplier += (targetSpeedMultiplier - speedMultiplier) * (1 - Math.exp(-delta / 0.18));
     const targetX = (Math.abs(motionX) > 0.02 ? motionX : pointerX) * 16;
     const targetY = (Math.abs(motionY) > 0.02 ? motionY : pointerY) * 16;
     dampedX += (targetX - dampedX) * damping;
@@ -266,7 +275,8 @@ const startTiltedTiles = () => {
     tracks.forEach((track, columnIndex) => {
       if (!reduced) {
         offsets[columnIndex] =
-          ((offsets[columnIndex] + velocities[columnIndex] * delta) % copyHeight + copyHeight) % copyHeight;
+          ((offsets[columnIndex] + velocities[columnIndex] * speedMultiplier * delta) % copyHeight + copyHeight) %
+          copyHeight;
       }
       track.style.transform = `translate3d(0, ${-2 * copyHeight - offsets[columnIndex]}px, 0)`;
     });
@@ -391,8 +401,29 @@ const renderTapMessage = () => {
 
 };
 
-const advanceTapMessage = () => {
-  if (messageIsChanging || loadingScreen?.classList.contains("is-gallery")) return;
+const advanceTapMessage = (event) => {
+  if (messageIsChanging || loadingScreen?.classList.contains("is-blank")) return;
+
+  if (loadingScreen?.classList.contains("is-gallery")) {
+    if (galleryTransitionStarted) return;
+    galleryTransitionStarted = true;
+    const rect = loadingScreen.getBoundingClientRect();
+    const swapX = event?.clientX ? event.clientX - rect.left : rect.width / 2;
+    const swapY = event?.clientY ? event.clientY - rect.top : rect.height / 2;
+    loadingScreen.style.setProperty("--swap-x", `${swapX}px`);
+    loadingScreen.style.setProperty("--swap-y", `${swapY}px`);
+    loadingScreen.classList.add("is-rushing");
+    tiltedTiles?.dispatchEvent(new Event("tilted-tiles-rush"));
+
+    window.setTimeout(() => loadingScreen.classList.add("is-liquid-swapping"), 650);
+    window.setTimeout(() => {
+      loadingScreen.classList.add("is-blank");
+      loadingScreen.setAttribute("aria-label", "Next scene");
+      memoriesScene?.setAttribute("aria-hidden", "true");
+      blankScene?.setAttribute("aria-hidden", "false");
+    }, 3150);
+    return;
+  }
 
   if (loadingScreen?.classList.contains("is-admiring")) {
     if (!admirationLetterWrap?.classList.contains("is-complete")) return;
