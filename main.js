@@ -12,8 +12,8 @@ const admirationLetterFirst = document.querySelector("[data-admiration-letter-fi
 const admirationLetterSecond = document.querySelector("[data-admiration-letter-second]");
 const admirationLetterWrap = document.querySelector("[data-admiration-letter-wrap]");
 const memoriesScene = document.querySelector("[data-memories-scene]");
-const driftWall = document.querySelector("[data-drift-wall]");
-const driftPlane = document.querySelector("[data-drift-plane]");
+const tiltedTiles = document.querySelector("[data-tilted-tiles]");
+const tiltedPlane = document.querySelector("[data-tilted-plane]");
 
 const birthdayLetterText =
   "Heloooo babbbyyyy ahhh happy happy happiest birthday my babbyyy hehe not a teen anymore naa blee. I hope u have a wonderful amazing outstanding day today naaa. Hehhehe I'm so happyy, babbyy I love u soo muchhhh I love u the mosttt <3";
@@ -131,101 +131,130 @@ const memoryImages = Array.from(
   (_, index) => `./assets/memories/memory-${String(index + 1).padStart(2, "0")}.jpeg`,
 );
 
-let driftStarted = false;
+let tiltedTilesStarted = false;
 
-const startDriftWall = () => {
-  if (!driftWall || !driftPlane || driftStarted) return;
+const startTiltedTiles = () => {
+  if (!tiltedTiles || !tiltedPlane || tiltedTilesStarted) return;
 
-  driftStarted = true;
-  const columns = 3;
-  const tileHeight = 178;
-  const gap = 12;
-  const unit = tileHeight + gap;
-  const columnItems = Array.from({ length: columns }, () => []);
+  tiltedTilesStarted = true;
+  const columns = 8;
+  const tilesPerColumn = 5;
+  const rowGap = 8;
+  const columnGap = 8;
+  const duration = 25;
+  const alternate = true;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const planeWidth = tiltedTiles.clientWidth * 2.8;
+  const tileWidth = planeWidth / columns - columnGap;
+  const tileHeight = tileWidth / 0.78;
+  const unit = tileHeight + rowGap;
+  const copyHeight = tilesPerColumn * unit;
   const tracks = [];
   const offsets = [];
   const velocities = [];
-  const baseSpeeds = [22, -29, 25];
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  memoryImages.forEach((image, index) => columnItems[index % columns].push(image));
+  tiltedTiles.style.setProperty("--tt-tile-w", `${tileWidth}px`);
+  tiltedTiles.style.setProperty("--tt-tile-h", `${tileHeight}px`);
+  tiltedTiles.style.setProperty("--tt-row-gap", `${rowGap}px`);
+  tiltedTiles.style.setProperty("--tt-col-gap", `${columnGap}px`);
 
-  columnItems.forEach((images, columnIndex) => {
+  for (let columnIndex = 0; columnIndex < columns; columnIndex += 1) {
     const column = document.createElement("div");
     const track = document.createElement("div");
-    column.className = "drift-wall__col";
-    track.className = "drift-wall__track";
+    column.className = "tilted-tiles__column";
+    track.className = "tilted-tiles__track";
 
-    for (let copyIndex = 0; copyIndex < 2; copyIndex += 1) {
-      images.forEach((source, itemIndex) => {
+    for (let copyIndex = 0; copyIndex < 3; copyIndex += 1) {
+      for (let itemIndex = 0; itemIndex < tilesPerColumn; itemIndex += 1) {
+        const memoryIndex = (columnIndex * tilesPerColumn + itemIndex) % memoryImages.length;
         const tile = document.createElement("div");
-        const inner = document.createElement("span");
         const image = document.createElement("img");
-        const overlay = document.createElement("span");
-        tile.className = "drift-wall__tile";
-        tile.tabIndex = 0;
-        tile.setAttribute("role", "button");
-        tile.setAttribute("aria-label", `Memory ${columnIndex + itemIndex * columns + 1}`);
-        inner.className = "drift-wall__inner";
-        image.src = source;
+        tile.className = "tilted-tiles__tile";
+        image.src = memoryImages[memoryIndex];
         image.alt = "";
         image.loading = copyIndex === 0 ? "eager" : "lazy";
         image.decoding = "async";
         image.draggable = false;
-        overlay.className = "drift-wall__overlay";
-        overlay.setAttribute("aria-hidden", "true");
-        inner.append(image, overlay);
-        tile.appendChild(inner);
+        tile.appendChild(image);
         track.appendChild(tile);
-      });
+      }
     }
 
     column.appendChild(track);
-    driftPlane.appendChild(column);
+    tiltedPlane.appendChild(column);
     tracks.push(track);
-    const copyHeight = images.length * unit;
-    offsets.push(copyHeight * ((columnIndex * 0.37) % 1));
-    velocities.push(0);
-    track.dataset.copyHeight = String(copyHeight);
-  });
+    offsets.push(copyHeight * (((columnIndex % 2) * 0.2 + columnIndex * 0.11) % 1));
+    const direction = alternate && columnIndex % 2 ? -1 : 1;
+    velocities.push((copyHeight / duration) * direction);
+  }
 
   let pointerX = 0;
   let pointerY = 0;
+  let motionX = 0;
+  let motionY = 0;
   let dampedX = 0;
   let dampedY = 0;
   let lastTimestamp = null;
+  let initialBeta = null;
+  let initialGamma = null;
 
-  driftWall.addEventListener("pointermove", (event) => {
-    if (reduced) return;
-    const rect = driftWall.getBoundingClientRect();
-    pointerX = (event.clientX - rect.left) / rect.width - 0.5;
-    pointerY = (event.clientY - rect.top) / rect.height - 0.5;
+  tiltedTiles.addEventListener("pointermove", (event) => {
+    if (reduced || event.pointerType === "touch") return;
+    const rect = tiltedTiles.getBoundingClientRect();
+    pointerX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+    pointerY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
   });
 
-  driftWall.addEventListener("pointerleave", () => {
+  tiltedTiles.addEventListener("pointerleave", () => {
     pointerX = 0;
     pointerY = 0;
   });
+
+  const handleOrientation = (event) => {
+    if (reduced || event.beta === null || event.gamma === null) return;
+    if (initialBeta === null || initialGamma === null) {
+      initialBeta = event.beta;
+      initialGamma = event.gamma;
+    }
+    motionX = Math.max(-1, Math.min(1, (event.gamma - initialGamma) / 24));
+    motionY = Math.max(-1, Math.min(1, (event.beta - initialBeta) / 24));
+  };
+
+  const enablePhoneParallax = async () => {
+    if (!("DeviceOrientationEvent" in window) || reduced) return;
+    try {
+      if (typeof DeviceOrientationEvent.requestPermission === "function") {
+        const permission = await DeviceOrientationEvent.requestPermission();
+        if (permission !== "granted") return;
+      }
+      window.addEventListener("deviceorientation", handleOrientation, { passive: true });
+    } catch {
+      // Pointer parallax remains available when motion permission is unavailable.
+    }
+  };
+
+  enablePhoneParallax();
 
   const animate = (timestamp) => {
     if (lastTimestamp === null) lastTimestamp = timestamp;
     const delta = Math.min(0.05, Math.max(0, timestamp - lastTimestamp) / 1000);
     lastTimestamp = timestamp;
-    const damping = 1 - Math.exp(-delta / 0.12);
-    dampedX += (pointerX * 4.8 - dampedX) * damping;
-    dampedY += (-pointerY * 4.8 - dampedY) * damping;
-    driftPlane.style.transform =
-      `translate(-50%, -50%) scale(1.16) rotateX(${10 + dampedY}deg) ` +
-      `rotateY(${-10 + dampedX}deg) translateZ(-90px)`;
+    const damping = 1 - Math.exp(-delta / 0.14);
+    const targetX = (Math.abs(motionX) > 0.02 ? motionX : pointerX) * 8;
+    const targetY = (Math.abs(motionY) > 0.02 ? motionY : pointerY) * 8;
+    dampedX += (targetX - dampedX) * damping;
+    dampedY += (targetY - dampedY) * damping;
+
+    tiltedPlane.style.transform =
+      `translate(-50%, -50%) rotateX(${40 - dampedY}deg) ` +
+      `rotateY(${16 + dampedX}deg) rotateZ(-20deg) translate3d(-40px, 0, 0)`;
 
     tracks.forEach((track, columnIndex) => {
-      const copyHeight = Number(track.dataset.copyHeight);
       if (!reduced) {
-        velocities[columnIndex] += (baseSpeeds[columnIndex] - velocities[columnIndex]) * (1 - Math.exp(-delta / 0.28));
         offsets[columnIndex] =
           ((offsets[columnIndex] + velocities[columnIndex] * delta) % copyHeight + copyHeight) % copyHeight;
       }
-      track.style.transform = `translate3d(0, ${-offsets[columnIndex]}px, 0)`;
+      track.style.transform = `translate3d(0, ${-copyHeight - offsets[columnIndex]}px, 0)`;
     });
 
     window.requestAnimationFrame(animate);
@@ -355,10 +384,10 @@ const advanceTapMessage = () => {
     if (!admirationLetterWrap?.classList.contains("is-complete")) return;
 
     loadingScreen.classList.add("is-gallery", "is-complete");
-    loadingScreen.setAttribute("aria-label", "Drifting wall of memories");
+    loadingScreen.setAttribute("aria-label", "Tilted tiles of memories");
     admirationScene?.setAttribute("aria-hidden", "true");
     memoriesScene?.setAttribute("aria-hidden", "false");
-    startDriftWall();
+    startTiltedTiles();
     return;
   }
 
