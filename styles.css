@@ -186,8 +186,8 @@ body {
 }
 
 .admiration-scene__letter-block--first {
-  top: 0;
-  bottom: 58%;
+  top: 3%;
+  bottom: 63%;
   left: 50%;
   width: calc(100% - 2rem);
   font-size: clamp(1.1rem, 5.2vw, 1.5rem);
@@ -196,12 +196,13 @@ body {
 }
 
 .admiration-scene__letter-block--second {
-  top: 44%;
-  right: 0.65rem;
-  bottom: 1rem;
-  left: 58%;
-  font-size: clamp(1rem, 4.5vw, 1.35rem);
-  line-height: 1.08;
+  top: 37%;
+  bottom: 48%;
+  left: 50%;
+  width: calc(100% - 2.25rem);
+  font-size: clamp(1.05rem, 4.8vw, 1.4rem);
+  line-height: 1.1;
+  transform: translateX(-50%);
 }
 
 .birthday-scene__art {
@@ -255,10 +256,10 @@ body {
 .admiration-scene__art {
   position: absolute;
   bottom: -1.25rem;
-  left: 43%;
-  width: 90%;
+  left: 40%;
+  width: 100%;
   max-width: 31rem;
-  max-height: 58%;
+  max-height: 48%;
   object-fit: contain;
   object-position: 50% 100%;
   border-radius: clamp(1.5rem, 7vw, 2.75rem);
