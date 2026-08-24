@@ -199,14 +199,14 @@ body {
   border: 0;
   appearance: none;
   background: transparent;
-  color: #48443f;
+  color: #34302d;
   font-family: "Caveat Local", "Segoe Print", "Bradley Hand", cursive;
   font-size: clamp(1.75rem, 8vw, 2.55rem);
   font-weight: 600;
   line-height: 1.05;
   letter-spacing: 0.025em;
   text-align: center;
-  text-shadow: 0 2px 1px rgb(45 41 37 / 18%), 0 5px 7px rgb(45 41 37 / 16%);
+  text-shadow: 0 2px 1px rgb(30 27 25 / 24%), 0 5px 7px rgb(30 27 25 / 18%);
   cursor: pointer;
   touch-action: manipulation;
   transform: translate(-50%, -50%);
@@ -240,7 +240,7 @@ body {
 }
 
 .tap-message:disabled {
-  color: #48443f;
+  color: #34302d;
   cursor: default;
 }
 
