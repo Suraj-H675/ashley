@@ -148,6 +148,7 @@ const preloadMemoryImages = () => {
 
 let tiltedTilesStarted = false;
 let galleryTransitionStarted = false;
+let galleryEntranceComplete = false;
 
 const startTiltedTiles = () => {
   if (!tiltedTiles || !tiltedPlane || tiltedTilesStarted) return;
@@ -168,6 +169,7 @@ const startTiltedTiles = () => {
   const tracks = [];
   const offsets = [];
   const velocities = [];
+  const logicalTileGroups = Array.from({ length: columns * tilesPerColumn }, () => []);
 
   tiltedTiles.style.setProperty("--tt-tile-w", `${tileWidth}px`);
   tiltedTiles.style.setProperty("--tt-tile-h", `${tileHeight}px`);
@@ -193,6 +195,7 @@ const startTiltedTiles = () => {
         image.draggable = false;
         tile.appendChild(image);
         track.appendChild(tile);
+        logicalTileGroups[columnIndex * tilesPerColumn + itemIndex].push(tile);
       }
     }
 
@@ -209,9 +212,10 @@ const startTiltedTiles = () => {
   let dampedY = 0;
   let lastTimestamp = null;
   let initialBeta = null;
-  let speedMultiplier = 12;
+  let speedMultiplier = 1;
   let targetSpeedMultiplier = 1;
-  let speedResponse = 0.55;
+  let speedResponse = 0.16;
+  let movementEnabled = false;
 
   tiltedTiles.addEventListener("tilted-tiles-rush", () => {
     targetSpeedMultiplier = 14;
@@ -257,7 +261,7 @@ const startTiltedTiles = () => {
     lastTimestamp = timestamp;
     const damping = 1 - Math.exp(-delta / 0.14);
     speedMultiplier += (targetSpeedMultiplier - speedMultiplier) * (1 - Math.exp(-delta / speedResponse));
-    const targetY = (Math.abs(motionY) > 0.02 ? motionY : pointerY) * 16;
+    const targetY = movementEnabled ? (Math.abs(motionY) > 0.02 ? motionY : pointerY) * 16 : 0;
     dampedY += (targetY - dampedY) * damping;
 
     tiltedPlane.style.transform =
@@ -265,7 +269,7 @@ const startTiltedTiles = () => {
       `rotateY(16deg) rotateZ(-20deg) translate3d(-40px, 0, 0)`;
 
     tracks.forEach((track, columnIndex) => {
-      if (!reduced) {
+      if (!reduced && movementEnabled) {
         offsets[columnIndex] =
           ((offsets[columnIndex] + velocities[columnIndex] * speedMultiplier * delta) % copyHeight + copyHeight) %
           copyHeight;
@@ -277,6 +281,30 @@ const startTiltedTiles = () => {
   };
 
   window.requestAnimationFrame(animate);
+
+  if (reduced) {
+    logicalTileGroups.flat().forEach((tile) => tile.classList.add("is-revealed"));
+    galleryEntranceComplete = true;
+    return;
+  }
+
+  const revealOrder = [...logicalTileGroups];
+  for (let index = revealOrder.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [revealOrder[index], revealOrder[swapIndex]] = [revealOrder[swapIndex], revealOrder[index]];
+  }
+
+  revealOrder.forEach((tileGroup, index) => {
+    window.setTimeout(() => {
+      tileGroup.forEach((tile) => tile.classList.add("is-revealed"));
+      if (index === revealOrder.length - 1) {
+        window.setTimeout(() => {
+          movementEnabled = true;
+          galleryEntranceComplete = true;
+        }, 280);
+      }
+    }, index * 68);
+  });
 };
 
 const pawSteps = [
@@ -397,7 +425,7 @@ const advanceTapMessage = () => {
   if (messageIsChanging || loadingScreen?.classList.contains("is-blank")) return;
 
   if (loadingScreen?.classList.contains("is-gallery")) {
-    if (galleryTransitionStarted) return;
+    if (!galleryEntranceComplete || galleryTransitionStarted) return;
     galleryTransitionStarted = true;
     loadingScreen.classList.add("is-rushing");
     tiltedTiles?.dispatchEvent(new Event("tilted-tiles-rush"));
