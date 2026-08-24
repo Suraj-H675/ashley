@@ -8,7 +8,8 @@ const loveScene = document.querySelector("[data-love-scene]");
 const loveLetter = document.querySelector("[data-love-letter]");
 const loveLetterWrap = document.querySelector("[data-love-letter-wrap]");
 const admirationScene = document.querySelector("[data-admiration-scene]");
-const admirationLetter = document.querySelector("[data-admiration-letter]");
+const admirationLetterFirst = document.querySelector("[data-admiration-letter-first]");
+const admirationLetterSecond = document.querySelector("[data-admiration-letter-second]");
 const admirationLetterWrap = document.querySelector("[data-admiration-letter-wrap]");
 
 const birthdayLetterText =
@@ -21,8 +22,10 @@ let admirationLetterStarted = false;
 const loveLetterText =
   "My love mwahhh mwahhh mwahh mwahhhh. We just had our 1 Year anniversary naa, and today is your Birthday hehehe wow buy one get one free hahaha. Today is my baby's birthday ahh I'm soo happy. I love you sooo soo very much baby. My baby bbayy forever and ever.\n\nMy wifey <333";
 
-const admirationLetterText =
-  "U were born today na isn't that crazy, and its been 20 years naa. Happpy happyy 20 my love. My beautiful baby nnaa. You are the kindest, most funniest, the most beautiful, the prettiest, the most lovely, literally soo perfect na. You are soo perfect in literally everyway. An angel naa hehehe. I wanna keep admiring u babbyy, i wanna keep saying how beautiful u are naa. Ahhhh soo beautiful in the inside and outside naaa, the most beautiful heart mwahh mwahh mwahhhhhhhhh";
+const admirationLetterFirstText =
+  "U were born today na isn't that crazy, and its been 20 years naa. Happpy happyy 20 my love. My beautiful baby nnaa. You are the kindest, most funniest, the most beautiful, the prettiest, the most lovely, literally soo perfect na. You are soo perfect in literally everyway. An angel naa hehehe.";
+const admirationLetterSecondText =
+  "I wanna keep admiring u babbyy, i wanna keep saying how beautiful u are naa. Ahhhh soo beautiful in the inside and outside naaa, the most beautiful heart mwahh mwahh mwahhhhhhhhh";
 
 const typeBirthdayLetter = () => {
   if (!birthdayLetter || birthdayLetterStarted) return;
@@ -87,22 +90,25 @@ const typeLoveLetter = () => {
 };
 
 const typeAdmirationLetter = () => {
-  if (!admirationLetter || admirationLetterStarted) return;
+  if (!admirationLetterFirst || !admirationLetterSecond || admirationLetterStarted) return;
 
   admirationLetterStarted = true;
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    admirationLetter.textContent = admirationLetterText;
+    admirationLetterFirst.textContent = admirationLetterFirstText;
+    admirationLetterSecond.textContent = admirationLetterSecondText;
     admirationLetterWrap?.classList.add("is-complete");
     return;
   }
 
-  const characters = Array.from(admirationLetterText);
+  const characters = Array.from(admirationLetterFirstText + admirationLetterSecondText);
+  const firstBlockLength = Array.from(admirationLetterFirstText).length;
   let characterIndex = 0;
 
   const typeNextCharacter = () => {
     const character = characters[characterIndex];
-    admirationLetter.textContent += character;
+    const activeBlock = characterIndex < firstBlockLength ? admirationLetterFirst : admirationLetterSecond;
+    activeBlock.textContent += character;
     characterIndex += 1;
 
     if (characterIndex >= characters.length) {

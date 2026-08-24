@@ -168,22 +168,40 @@ body {
 .admiration-scene__letter {
   position: absolute;
   z-index: 1;
-  top: 0.75rem;
-  right: 0.65rem;
-  bottom: 0.75rem;
-  left: 56%;
+  inset: 0;
+}
+
+.admiration-scene__letter-block {
+  position: absolute;
   display: grid;
   place-items: center;
   margin: 0;
   color: #34302d;
   font-family: "Caveat Local", "Segoe Print", "Bradley Hand", cursive;
-  font-size: clamp(1.05rem, 4.8vw, 1.45rem);
   font-weight: 600;
-  line-height: 1.1;
   text-align: center;
   text-shadow: 0 2px 1px rgb(30 27 25 / 24%), 0 5px 7px rgb(30 27 25 / 14%);
   -webkit-text-fill-color: #34302d;
   -webkit-text-stroke: 0.12px #34302d;
+}
+
+.admiration-scene__letter-block--first {
+  top: 0;
+  bottom: 58%;
+  left: 50%;
+  width: calc(100% - 2rem);
+  font-size: clamp(1.1rem, 5.2vw, 1.5rem);
+  line-height: 1.14;
+  transform: translateX(-50%);
+}
+
+.admiration-scene__letter-block--second {
+  top: 44%;
+  right: 0.65rem;
+  bottom: 1rem;
+  left: 58%;
+  font-size: clamp(1rem, 4.5vw, 1.35rem);
+  line-height: 1.08;
 }
 
 .birthday-scene__art {
@@ -237,10 +255,10 @@ body {
 .admiration-scene__art {
   position: absolute;
   bottom: -1.25rem;
-  left: 15%;
-  width: 82%;
+  left: 43%;
+  width: 90%;
   max-width: 31rem;
-  max-height: 70%;
+  max-height: 58%;
   object-fit: contain;
   object-position: 50% 100%;
   border-radius: clamp(1.5rem, 7vw, 2.75rem);

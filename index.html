@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#f4f3f0" />
     <title>Ashley</title>
     <link rel="preload" href="./assets/cat-loading-sketch.png" as="image" />
-    <link rel="stylesheet" href="./styles.css?v=20260824-9" />
+    <link rel="stylesheet" href="./styles.css?v=20260824-10" />
   </head>
   <body>
     <main class="loading-screen" data-loading-screen aria-label="Loading" aria-busy="true">
@@ -60,8 +60,13 @@
       </section>
 
       <section class="admiration-scene" data-admiration-scene aria-hidden="true">
-        <p class="admiration-scene__letter" data-admiration-letter-wrap>
-          <span data-admiration-letter aria-hidden="true"></span>
+        <div class="admiration-scene__letter" data-admiration-letter-wrap>
+          <p class="admiration-scene__letter-block admiration-scene__letter-block--first">
+            <span data-admiration-letter-first aria-hidden="true"></span>
+          </p>
+          <p class="admiration-scene__letter-block admiration-scene__letter-block--second">
+            <span data-admiration-letter-second aria-hidden="true"></span>
+          </p>
           <span class="sr-only">
             U were born today na isn't that crazy, and its been 20 years naa. Happpy happyy 20 my
             love. My beautiful baby nnaa. You are the kindest, most funniest, the most beautiful, the
@@ -70,7 +75,7 @@
             beautiful u are naa. Ahhhh soo beautiful in the inside and outside naaa, the most
             beautiful heart mwahh mwahh mwahhhhhhhhh
           </span>
-        </p>
+        </div>
         <img
           class="admiration-scene__art"
           src="./assets/dinner-together.png"
@@ -80,6 +85,6 @@
       </section>
     </main>
 
-    <script src="./main.js?v=20260824-5"></script>
+    <script src="./main.js?v=20260824-6"></script>
   </body>
 </html>
