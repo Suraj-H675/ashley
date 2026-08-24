@@ -120,14 +120,29 @@ body {
 }
 
 .memories-scene {
+  --gallery-fill: 0;
   position: absolute;
   z-index: 7;
   inset: 0;
   overflow: hidden;
   visibility: hidden;
-  background: #130e10;
+  background-color: #f3f2ef;
+  background-image: url("./assets/birthday-paper.png");
+  background-position: center;
+  background-size: cover;
   opacity: 0;
   transition: opacity 700ms ease-out, visibility 700ms;
+}
+
+.memories-scene::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: #130e10;
+  opacity: var(--gallery-fill);
+  transition: opacity 120ms linear;
 }
 
 .loading-screen.is-gallery .memories-scene {
@@ -159,6 +174,7 @@ body {
   --tt-row-gap: 0.5rem;
   --tt-col-gap: 0.5rem;
   position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   overflow: hidden;
