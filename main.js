@@ -204,15 +204,11 @@ const startTiltedTiles = () => {
     velocities.push((copyHeight / duration) * direction);
   }
 
-  let pointerX = 0;
   let pointerY = 0;
-  let motionX = 0;
   let motionY = 0;
-  let dampedX = 0;
   let dampedY = 0;
   let lastTimestamp = null;
   let initialBeta = null;
-  let initialGamma = null;
   let speedMultiplier = 1;
   let targetSpeedMultiplier = 1;
 
@@ -223,22 +219,18 @@ const startTiltedTiles = () => {
   tiltedTiles.addEventListener("pointermove", (event) => {
     if (reduced || event.pointerType === "touch") return;
     const rect = tiltedTiles.getBoundingClientRect();
-    pointerX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
     pointerY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
   });
 
   tiltedTiles.addEventListener("pointerleave", () => {
-    pointerX = 0;
     pointerY = 0;
   });
 
   const handleOrientation = (event) => {
-    if (reduced || event.beta === null || event.gamma === null) return;
-    if (initialBeta === null || initialGamma === null) {
+    if (reduced || event.beta === null) return;
+    if (initialBeta === null) {
       initialBeta = event.beta;
-      initialGamma = event.gamma;
     }
-    motionX = Math.max(-1, Math.min(1, (event.gamma - initialGamma) / 14));
     motionY = Math.max(-1, Math.min(1, (event.beta - initialBeta) / 14));
   };
 
@@ -263,14 +255,12 @@ const startTiltedTiles = () => {
     lastTimestamp = timestamp;
     const damping = 1 - Math.exp(-delta / 0.14);
     speedMultiplier += (targetSpeedMultiplier - speedMultiplier) * (1 - Math.exp(-delta / 0.18));
-    const targetX = (Math.abs(motionX) > 0.02 ? motionX : pointerX) * 16;
     const targetY = (Math.abs(motionY) > 0.02 ? motionY : pointerY) * 16;
-    dampedX += (targetX - dampedX) * damping;
     dampedY += (targetY - dampedY) * damping;
 
     tiltedPlane.style.transform =
       `translate(-50%, -50%) rotateX(${40 - dampedY}deg) ` +
-      `rotateY(${16 + dampedX}deg) rotateZ(-20deg) translate3d(-40px, 0, 0)`;
+      `rotateY(16deg) rotateZ(-20deg) translate3d(-40px, 0, 0)`;
 
     tracks.forEach((track, columnIndex) => {
       if (!reduced) {
