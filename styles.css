@@ -142,7 +142,7 @@ body {
   background-position: center;
   background-size: cover;
   opacity: var(--paper-opacity);
-  transition: opacity 120ms linear;
+  transition: opacity 240ms linear;
 }
 
 .loading-screen.is-gallery .memories-scene {

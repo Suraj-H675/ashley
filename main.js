@@ -306,7 +306,7 @@ const startTiltedTiles = () => {
           galleryEntranceComplete = true;
         }, 280);
       }
-    }, 500 + index * 68);
+    }, 700 + index * 180);
   });
 };
 
