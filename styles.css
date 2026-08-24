@@ -215,6 +215,8 @@ body {
   letter-spacing: 0.025em;
   text-align: center;
   text-shadow: 0 2px 1px rgb(30 27 25 / 24%), 0 5px 7px rgb(30 27 25 / 18%);
+  -webkit-text-fill-color: #34302d;
+  -webkit-text-stroke: 0.15px #34302d;
   cursor: pointer;
   touch-action: manipulation;
   transform: translate(-50%, -50%);
@@ -250,6 +252,8 @@ body {
 .tap-message:disabled {
   color: #34302d;
   cursor: default;
+  opacity: 1;
+  -webkit-text-fill-color: #34302d;
 }
 
 .tap-message__cat {
