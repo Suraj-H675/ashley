@@ -2,6 +2,44 @@ const pawTrail = document.querySelector("[data-paw-trail]");
 const loadingScreen = document.querySelector("[data-loading-screen]");
 const tapMessage = document.querySelector("[data-tap-message]");
 const birthdayScene = document.querySelector("[data-birthday-scene]");
+const birthdayLetter = document.querySelector("[data-birthday-letter]");
+const birthdayLetterWrap = document.querySelector("[data-birthday-letter-wrap]");
+
+const birthdayLetterText =
+  "Heloooo babbbyyyy ahhh happy happy happiest birthday my babbyyy hehe not a teen anymore naa blee. I hope u have a wonderful amazing outstanding day today naaa. Hehhehe I'm so happyy, babbyy I love u soo muchhhh I love u the mosttt <3";
+
+let birthdayLetterStarted = false;
+
+const typeBirthdayLetter = () => {
+  if (!birthdayLetter || birthdayLetterStarted) return;
+
+  birthdayLetterStarted = true;
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    birthdayLetter.textContent = birthdayLetterText;
+    birthdayLetterWrap?.classList.add("is-complete");
+    return;
+  }
+
+  const characters = Array.from(birthdayLetterText);
+  let characterIndex = 0;
+
+  const typeNextCharacter = () => {
+    const character = characters[characterIndex];
+    birthdayLetter.textContent += character;
+    characterIndex += 1;
+
+    if (characterIndex >= characters.length) {
+      birthdayLetterWrap?.classList.add("is-complete");
+      return;
+    }
+
+    const delay = character === "." ? 210 : character === "," ? 100 : character === " " ? 18 : 36;
+    window.setTimeout(typeNextCharacter, delay);
+  };
+
+  window.setTimeout(typeNextCharacter, 280);
+};
 
 const pawSteps = [
   { x: 11, y: 67, rotation: -8, size: 8.5 },
@@ -125,6 +163,7 @@ const advanceTapMessage = () => {
     loadingScreen?.setAttribute("aria-busy", "false");
     loadingScreen?.setAttribute("aria-label", "Birthday scene");
     birthdayScene?.setAttribute("aria-hidden", "false");
+    typeBirthdayLetter();
 
     if (tapMessage) {
       tapMessage.disabled = true;
