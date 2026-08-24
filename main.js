@@ -131,6 +131,20 @@ const memoryImages = Array.from(
   (_, index) => `./assets/memories/memory-${String(index + 1).padStart(2, "0")}.jpeg`,
 );
 
+const memoryPreloads = [];
+let memoryPreloadStarted = false;
+
+const preloadMemoryImages = () => {
+  if (memoryPreloadStarted) return;
+  memoryPreloadStarted = true;
+  memoryImages.forEach((source) => {
+    const image = new Image();
+    image.decoding = "async";
+    image.src = source;
+    memoryPreloads.push(image);
+  });
+};
+
 let tiltedTilesStarted = false;
 
 const startTiltedTiles = () => {
@@ -164,7 +178,7 @@ const startTiltedTiles = () => {
     column.className = "tilted-tiles__column";
     track.className = "tilted-tiles__track";
 
-    for (let copyIndex = 0; copyIndex < 3; copyIndex += 1) {
+    for (let copyIndex = 0; copyIndex < 5; copyIndex += 1) {
       for (let itemIndex = 0; itemIndex < tilesPerColumn; itemIndex += 1) {
         const memoryIndex = (columnIndex * tilesPerColumn + itemIndex) % memoryImages.length;
         const tile = document.createElement("div");
@@ -172,7 +186,7 @@ const startTiltedTiles = () => {
         tile.className = "tilted-tiles__tile";
         image.src = memoryImages[memoryIndex];
         image.alt = "";
-        image.loading = copyIndex === 0 ? "eager" : "lazy";
+        image.loading = "eager";
         image.decoding = "async";
         image.draggable = false;
         tile.appendChild(image);
@@ -216,8 +230,8 @@ const startTiltedTiles = () => {
       initialBeta = event.beta;
       initialGamma = event.gamma;
     }
-    motionX = Math.max(-1, Math.min(1, (event.gamma - initialGamma) / 24));
-    motionY = Math.max(-1, Math.min(1, (event.beta - initialBeta) / 24));
+    motionX = Math.max(-1, Math.min(1, (event.gamma - initialGamma) / 14));
+    motionY = Math.max(-1, Math.min(1, (event.beta - initialBeta) / 14));
   };
 
   const enablePhoneParallax = async () => {
@@ -240,8 +254,8 @@ const startTiltedTiles = () => {
     const delta = Math.min(0.05, Math.max(0, timestamp - lastTimestamp) / 1000);
     lastTimestamp = timestamp;
     const damping = 1 - Math.exp(-delta / 0.14);
-    const targetX = (Math.abs(motionX) > 0.02 ? motionX : pointerX) * 8;
-    const targetY = (Math.abs(motionY) > 0.02 ? motionY : pointerY) * 8;
+    const targetX = (Math.abs(motionX) > 0.02 ? motionX : pointerX) * 16;
+    const targetY = (Math.abs(motionY) > 0.02 ? motionY : pointerY) * 16;
     dampedX += (targetX - dampedX) * damping;
     dampedY += (targetY - dampedY) * damping;
 
@@ -254,7 +268,7 @@ const startTiltedTiles = () => {
         offsets[columnIndex] =
           ((offsets[columnIndex] + velocities[columnIndex] * delta) % copyHeight + copyHeight) % copyHeight;
       }
-      track.style.transform = `translate3d(0, ${-copyHeight - offsets[columnIndex]}px, 0)`;
+      track.style.transform = `translate3d(0, ${-2 * copyHeight - offsets[columnIndex]}px, 0)`;
     });
 
     window.requestAnimationFrame(animate);
@@ -398,6 +412,7 @@ const advanceTapMessage = () => {
     loadingScreen.setAttribute("aria-label", "Admiration letter scene");
     loveScene?.setAttribute("aria-hidden", "true");
     admirationScene?.setAttribute("aria-hidden", "false");
+    preloadMemoryImages();
     typeAdmirationLetter();
     return;
   }
