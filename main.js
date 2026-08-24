@@ -7,15 +7,22 @@ const birthdayLetterWrap = document.querySelector("[data-birthday-letter-wrap]")
 const loveScene = document.querySelector("[data-love-scene]");
 const loveLetter = document.querySelector("[data-love-letter]");
 const loveLetterWrap = document.querySelector("[data-love-letter-wrap]");
+const admirationScene = document.querySelector("[data-admiration-scene]");
+const admirationLetter = document.querySelector("[data-admiration-letter]");
+const admirationLetterWrap = document.querySelector("[data-admiration-letter-wrap]");
 
 const birthdayLetterText =
   "Heloooo babbbyyyy ahhh happy happy happiest birthday my babbyyy hehe not a teen anymore naa blee. I hope u have a wonderful amazing outstanding day today naaa. Hehhehe I'm so happyy, babbyy I love u soo muchhhh I love u the mosttt <3";
 
 let birthdayLetterStarted = false;
 let loveLetterStarted = false;
+let admirationLetterStarted = false;
 
 const loveLetterText =
   "My love mwahhh mwahhh mwahh mwahhhh. We just had our 1 Year anniversary naa, and today is your Birthday hehehe wow buy one get one free hahaha. Today is my baby's birthday ahh I'm soo happy. I love you sooo soo very much baby. My baby bbayy forever and ever.\n\nMy wifey <333";
+
+const admirationLetterText =
+  "U were born today na isn't that crazy, and its been 20 years naa. Happpy happyy 20 my love. My beautiful baby nnaa. You are the kindest, most funniest, the most beautiful, the prettiest, the most lovely, literally soo perfect na. You are soo perfect in literally everyway. An angel naa hehehe. I wanna keep admiring u babbyy, i wanna keep saying how beautiful u are naa. Ahhhh soo beautiful in the inside and outside naaa, the most beautiful heart mwahh mwahh mwahhhhhhhhh";
 
 const typeBirthdayLetter = () => {
   if (!birthdayLetter || birthdayLetterStarted) return;
@@ -69,6 +76,37 @@ const typeLoveLetter = () => {
 
     if (characterIndex >= characters.length) {
       loveLetterWrap?.classList.add("is-complete");
+      return;
+    }
+
+    const delay = character === "." ? 210 : character === "," ? 100 : character === " " ? 18 : 36;
+    window.setTimeout(typeNextCharacter, delay);
+  };
+
+  window.setTimeout(typeNextCharacter, 280);
+};
+
+const typeAdmirationLetter = () => {
+  if (!admirationLetter || admirationLetterStarted) return;
+
+  admirationLetterStarted = true;
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    admirationLetter.textContent = admirationLetterText;
+    admirationLetterWrap?.classList.add("is-complete");
+    return;
+  }
+
+  const characters = Array.from(admirationLetterText);
+  let characterIndex = 0;
+
+  const typeNextCharacter = () => {
+    const character = characters[characterIndex];
+    admirationLetter.textContent += character;
+    characterIndex += 1;
+
+    if (characterIndex >= characters.length) {
+      admirationLetterWrap?.classList.add("is-complete");
       return;
     }
 
@@ -194,7 +232,18 @@ const renderTapMessage = () => {
 };
 
 const advanceTapMessage = () => {
-  if (messageIsChanging || loadingScreen?.classList.contains("is-loving")) return;
+  if (messageIsChanging || loadingScreen?.classList.contains("is-admiring")) return;
+
+  if (loadingScreen?.classList.contains("is-loving")) {
+    if (!loveLetterWrap?.classList.contains("is-complete")) return;
+
+    loadingScreen.classList.add("is-admiring", "is-complete");
+    loadingScreen.setAttribute("aria-label", "Admiration letter scene");
+    loveScene?.setAttribute("aria-hidden", "true");
+    admirationScene?.setAttribute("aria-hidden", "false");
+    typeAdmirationLetter();
+    return;
+  }
 
   if (loadingScreen?.classList.contains("is-celebrating")) {
     if (!birthdayLetterWrap?.classList.contains("is-complete")) return;

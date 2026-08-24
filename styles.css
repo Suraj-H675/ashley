@@ -104,6 +104,21 @@ body {
   transition: opacity 650ms ease-out, visibility 650ms;
 }
 
+.admiration-scene {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  overflow: hidden;
+  visibility: hidden;
+  background-color: #f3f2ef;
+  background-image: url("./assets/birthday-paper.png");
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 650ms ease-out, visibility 650ms;
+}
+
 .birthday-scene__letter {
   position: absolute;
   z-index: 1;
@@ -144,6 +159,28 @@ body {
   line-height: 1.2;
   text-align: center;
   white-space: pre-line;
+  text-shadow: 0 2px 1px rgb(30 27 25 / 24%), 0 5px 7px rgb(30 27 25 / 14%);
+  transform: translateX(-50%);
+  -webkit-text-fill-color: #34302d;
+  -webkit-text-stroke: 0.12px #34302d;
+}
+
+.admiration-scene__letter {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 53%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: calc(100% - 1.75rem);
+  margin: 0;
+  color: #34302d;
+  font-family: "Caveat Local", "Segoe Print", "Bradley Hand", cursive;
+  font-size: clamp(1.08rem, 5.25vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.12;
+  text-align: center;
   text-shadow: 0 2px 1px rgb(30 27 25 / 24%), 0 5px 7px rgb(30 27 25 / 14%);
   transform: translateX(-50%);
   -webkit-text-fill-color: #34302d;
@@ -198,6 +235,30 @@ body {
   -webkit-user-drag: none;
 }
 
+.admiration-scene__art {
+  position: absolute;
+  bottom: -1.25rem;
+  left: 50%;
+  width: 108%;
+  max-width: 31rem;
+  max-height: 56%;
+  object-fit: contain;
+  object-position: 50% 100%;
+  border-radius: clamp(1.5rem, 7vw, 2.75rem);
+  opacity: 0;
+  filter: drop-shadow(0 0.75rem 0.9rem rgb(64 57 50 / 24%));
+  transform: translate(-50%, calc(100% + 1rem)) scale(0.985);
+  transform-origin: 50% 100%;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 4%, #000 96%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 7%, #000 96%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 4%, #000 96%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 7%, #000 96%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  -webkit-user-drag: none;
+}
+
 .loading-screen.is-celebrating .birthday-scene {
   visibility: visible;
   opacity: 1;
@@ -213,6 +274,15 @@ body {
 }
 
 .loading-screen.is-loving .love-scene__art {
+  animation: birthday-art-rise 900ms cubic-bezier(0.2, 0.75, 0.35, 1) 120ms both;
+}
+
+.loading-screen.is-admiring .admiration-scene {
+  visibility: visible;
+  opacity: 1;
+}
+
+.loading-screen.is-admiring .admiration-scene__art {
   animation: birthday-art-rise 900ms cubic-bezier(0.2, 0.75, 0.35, 1) 120ms both;
 }
 
@@ -429,7 +499,9 @@ body {
   .birthday-scene,
   .birthday-scene__art,
   .love-scene,
-  .love-scene__art {
+  .love-scene__art,
+  .admiration-scene,
+  .admiration-scene__art {
     transition: none;
   }
 
@@ -440,6 +512,12 @@ body {
   }
 
   .loading-screen.is-loving .love-scene__art {
+    opacity: 1;
+    animation: none;
+    transform: translate(-50%, 0);
+  }
+
+  .loading-screen.is-admiring .admiration-scene__art {
     opacity: 1;
     animation: none;
     transform: translate(-50%, 0);
