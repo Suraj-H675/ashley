@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f4f3f0" />
+    <title>Ashley</title>
+    <link rel="preload" href="./assets/cat-loading-sketch.png" as="image" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="loading-screen" data-loading-screen aria-label="Loading" aria-busy="true">
+      <img
+        class="loading-screen__art"
+        src="./assets/cat-loading-sketch.png"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <div class="paw-trail" data-paw-trail aria-hidden="true"></div>
+      <button class="tap-message" type="button" data-tap-message aria-live="polite">
+        <span>tap me nyan</span>
+        <span class="tap-message__cat" role="img" aria-label="smirking emoticon">¬‿¬</span>
+      </button>
+      <p class="sr-only" role="status" aria-live="polite">Loading, please wait.</p>
+
+      <section class="birthday-scene" data-birthday-scene aria-hidden="true">
+        <img
+          class="birthday-scene__art"
+          src="./assets/sleeping-together.png"
+          alt="A sleeping person cuddled beside a sleeping cat"
+          draggable="false"
+        />
+      </section>
+    </main>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
