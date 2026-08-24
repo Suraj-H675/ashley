@@ -284,7 +284,7 @@ const startTiltedTiles = () => {
 
   if (reduced) {
     logicalTileGroups.flat().forEach((tile) => tile.classList.add("is-revealed"));
-    memoriesScene?.style.setProperty("--gallery-fill", "1");
+    memoriesScene?.style.setProperty("--paper-opacity", "0");
     galleryEntranceComplete = true;
     return;
   }
@@ -299,14 +299,14 @@ const startTiltedTiles = () => {
     window.setTimeout(() => {
       tileGroup.forEach((tile) => tile.classList.add("is-revealed"));
       const fillProgress = (index + 1) / revealOrder.length;
-      memoriesScene?.style.setProperty("--gallery-fill", String(fillProgress));
+      memoriesScene?.style.setProperty("--paper-opacity", String(1 - fillProgress));
       if (index === revealOrder.length - 1) {
         window.setTimeout(() => {
           movementEnabled = true;
           galleryEntranceComplete = true;
         }, 280);
       }
-    }, 250 + index * 68);
+    }, 500 + index * 68);
   });
 };
 

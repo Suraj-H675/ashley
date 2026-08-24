@@ -120,16 +120,13 @@ body {
 }
 
 .memories-scene {
-  --gallery-fill: 0;
+  --paper-opacity: 1;
   position: absolute;
   z-index: 7;
   inset: 0;
   overflow: hidden;
   visibility: hidden;
-  background-color: #f3f2ef;
-  background-image: url("./assets/birthday-paper.png");
-  background-position: center;
-  background-size: cover;
+  background: #130e10;
   opacity: 0;
   transition: opacity 700ms ease-out, visibility 700ms;
 }
@@ -140,8 +137,11 @@ body {
   inset: 0;
   content: "";
   pointer-events: none;
-  background: #130e10;
-  opacity: var(--gallery-fill);
+  background-color: #f3f2ef;
+  background-image: url("./assets/birthday-paper.png");
+  background-position: center;
+  background-size: cover;
+  opacity: var(--paper-opacity);
   transition: opacity 120ms linear;
 }
 
