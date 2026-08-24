@@ -38,12 +38,20 @@ body {
   overflow: hidden;
   cursor: pointer;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
   background-color: #f4f3f0;
   background-image: url("./assets/cat-loading-sketch.png");
   background-position: 50% 50%;
   background-size: cover;
   opacity: 1;
   transition: opacity 420ms ease-out, visibility 420ms;
+}
+
+.loading-screen img {
+  pointer-events: none;
 }
 
 .loading-screen::after {
