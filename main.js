@@ -4,11 +4,18 @@ const tapMessage = document.querySelector("[data-tap-message]");
 const birthdayScene = document.querySelector("[data-birthday-scene]");
 const birthdayLetter = document.querySelector("[data-birthday-letter]");
 const birthdayLetterWrap = document.querySelector("[data-birthday-letter-wrap]");
+const loveScene = document.querySelector("[data-love-scene]");
+const loveLetter = document.querySelector("[data-love-letter]");
+const loveLetterWrap = document.querySelector("[data-love-letter-wrap]");
 
 const birthdayLetterText =
   "Heloooo babbbyyyy ahhh happy happy happiest birthday my babbyyy hehe not a teen anymore naa blee. I hope u have a wonderful amazing outstanding day today naaa. Hehhehe I'm so happyy, babbyy I love u soo muchhhh I love u the mosttt <3";
 
 let birthdayLetterStarted = false;
+let loveLetterStarted = false;
+
+const loveLetterText =
+  "My love mwahhh mwahhh mwahh mwahhhh. We just had our 1 Year anniversary naa, and today is your Birthday hehehe wow buy one get one free hahaha. Today is my baby's birthday ahh I'm soo happy. I love you sooo soo very much baby. My baby bbayy forever and ever.\n\nMy wifey <333";
 
 const typeBirthdayLetter = () => {
   if (!birthdayLetter || birthdayLetterStarted) return;
@@ -31,6 +38,37 @@ const typeBirthdayLetter = () => {
 
     if (characterIndex >= characters.length) {
       birthdayLetterWrap?.classList.add("is-complete");
+      return;
+    }
+
+    const delay = character === "." ? 210 : character === "," ? 100 : character === " " ? 18 : 36;
+    window.setTimeout(typeNextCharacter, delay);
+  };
+
+  window.setTimeout(typeNextCharacter, 280);
+};
+
+const typeLoveLetter = () => {
+  if (!loveLetter || loveLetterStarted) return;
+
+  loveLetterStarted = true;
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    loveLetter.textContent = loveLetterText;
+    loveLetterWrap?.classList.add("is-complete");
+    return;
+  }
+
+  const characters = Array.from(loveLetterText);
+  let characterIndex = 0;
+
+  const typeNextCharacter = () => {
+    const character = characters[characterIndex];
+    loveLetter.textContent += character;
+    characterIndex += 1;
+
+    if (characterIndex >= characters.length) {
+      loveLetterWrap?.classList.add("is-complete");
       return;
     }
 
@@ -156,10 +194,21 @@ const renderTapMessage = () => {
 };
 
 const advanceTapMessage = () => {
-  if (messageIsChanging || loadingScreen?.classList.contains("is-celebrating")) return;
+  if (messageIsChanging || loadingScreen?.classList.contains("is-loving")) return;
+
+  if (loadingScreen?.classList.contains("is-celebrating")) {
+    if (!birthdayLetterWrap?.classList.contains("is-complete")) return;
+
+    loadingScreen.classList.add("is-loving", "is-complete");
+    loadingScreen.setAttribute("aria-label", "Love letter scene");
+    birthdayScene?.setAttribute("aria-hidden", "true");
+    loveScene?.setAttribute("aria-hidden", "false");
+    typeLoveLetter();
+    return;
+  }
 
   if (messageIndex >= messageSequence.length - 1) {
-    loadingScreen?.classList.add("is-celebrating", "is-complete");
+    loadingScreen?.classList.add("is-celebrating");
     loadingScreen?.setAttribute("aria-busy", "false");
     loadingScreen?.setAttribute("aria-label", "Birthday scene");
     birthdayScene?.setAttribute("aria-hidden", "false");
