@@ -209,11 +209,13 @@ const startTiltedTiles = () => {
   let dampedY = 0;
   let lastTimestamp = null;
   let initialBeta = null;
-  let speedMultiplier = 1;
+  let speedMultiplier = 12;
   let targetSpeedMultiplier = 1;
+  let speedResponse = 0.55;
 
   tiltedTiles.addEventListener("tilted-tiles-rush", () => {
     targetSpeedMultiplier = 14;
+    speedResponse = 0.16;
   });
 
   tiltedTiles.addEventListener("pointermove", (event) => {
@@ -254,7 +256,7 @@ const startTiltedTiles = () => {
     const delta = Math.min(0.05, Math.max(0, timestamp - lastTimestamp) / 1000);
     lastTimestamp = timestamp;
     const damping = 1 - Math.exp(-delta / 0.14);
-    speedMultiplier += (targetSpeedMultiplier - speedMultiplier) * (1 - Math.exp(-delta / 0.18));
+    speedMultiplier += (targetSpeedMultiplier - speedMultiplier) * (1 - Math.exp(-delta / speedResponse));
     const targetY = (Math.abs(motionY) > 0.02 ? motionY : pointerY) * 16;
     dampedY += (targetY - dampedY) * damping;
 
