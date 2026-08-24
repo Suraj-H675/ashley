@@ -401,27 +401,21 @@ const renderTapMessage = () => {
 
 };
 
-const advanceTapMessage = (event) => {
+const advanceTapMessage = () => {
   if (messageIsChanging || loadingScreen?.classList.contains("is-blank")) return;
 
   if (loadingScreen?.classList.contains("is-gallery")) {
     if (galleryTransitionStarted) return;
     galleryTransitionStarted = true;
-    const rect = loadingScreen.getBoundingClientRect();
-    const swapX = event?.clientX ? event.clientX - rect.left : rect.width / 2;
-    const swapY = event?.clientY ? event.clientY - rect.top : rect.height / 2;
-    loadingScreen.style.setProperty("--swap-x", `${swapX}px`);
-    loadingScreen.style.setProperty("--swap-y", `${swapY}px`);
     loadingScreen.classList.add("is-rushing");
     tiltedTiles?.dispatchEvent(new Event("tilted-tiles-rush"));
 
-    window.setTimeout(() => loadingScreen.classList.add("is-liquid-swapping"), 650);
     window.setTimeout(() => {
       loadingScreen.classList.add("is-blank");
       loadingScreen.setAttribute("aria-label", "Next scene");
       memoriesScene?.setAttribute("aria-hidden", "true");
       blankScene?.setAttribute("aria-hidden", "false");
-    }, 3150);
+    }, 900);
     return;
   }
 
