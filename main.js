@@ -11,6 +11,9 @@ const admirationScene = document.querySelector("[data-admiration-scene]");
 const admirationLetterFirst = document.querySelector("[data-admiration-letter-first]");
 const admirationLetterSecond = document.querySelector("[data-admiration-letter-second]");
 const admirationLetterWrap = document.querySelector("[data-admiration-letter-wrap]");
+const memoriesScene = document.querySelector("[data-memories-scene]");
+const driftWall = document.querySelector("[data-drift-wall]");
+const driftPlane = document.querySelector("[data-drift-plane]");
 
 const birthdayLetterText =
   "Heloooo babbbyyyy ahhh happy happy happiest birthday my babbyyy hehe not a teen anymore naa blee. I hope u have a wonderful amazing outstanding day today naaa. Hehhehe I'm so happyy, babbyy I love u soo muchhhh I love u the mosttt <3";
@@ -121,6 +124,114 @@ const typeAdmirationLetter = () => {
   };
 
   window.setTimeout(typeNextCharacter, 280);
+};
+
+const memoryImages = Array.from(
+  { length: 35 },
+  (_, index) => `./assets/memories/memory-${String(index + 1).padStart(2, "0")}.jpeg`,
+);
+
+let driftStarted = false;
+
+const startDriftWall = () => {
+  if (!driftWall || !driftPlane || driftStarted) return;
+
+  driftStarted = true;
+  const columns = 3;
+  const tileHeight = 178;
+  const gap = 12;
+  const unit = tileHeight + gap;
+  const columnItems = Array.from({ length: columns }, () => []);
+  const tracks = [];
+  const offsets = [];
+  const velocities = [];
+  const baseSpeeds = [22, -29, 25];
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  memoryImages.forEach((image, index) => columnItems[index % columns].push(image));
+
+  columnItems.forEach((images, columnIndex) => {
+    const column = document.createElement("div");
+    const track = document.createElement("div");
+    column.className = "drift-wall__col";
+    track.className = "drift-wall__track";
+
+    for (let copyIndex = 0; copyIndex < 2; copyIndex += 1) {
+      images.forEach((source, itemIndex) => {
+        const tile = document.createElement("div");
+        const inner = document.createElement("span");
+        const image = document.createElement("img");
+        const overlay = document.createElement("span");
+        tile.className = "drift-wall__tile";
+        tile.tabIndex = 0;
+        tile.setAttribute("role", "button");
+        tile.setAttribute("aria-label", `Memory ${columnIndex + itemIndex * columns + 1}`);
+        inner.className = "drift-wall__inner";
+        image.src = source;
+        image.alt = "";
+        image.loading = copyIndex === 0 ? "eager" : "lazy";
+        image.decoding = "async";
+        image.draggable = false;
+        overlay.className = "drift-wall__overlay";
+        overlay.setAttribute("aria-hidden", "true");
+        inner.append(image, overlay);
+        tile.appendChild(inner);
+        track.appendChild(tile);
+      });
+    }
+
+    column.appendChild(track);
+    driftPlane.appendChild(column);
+    tracks.push(track);
+    const copyHeight = images.length * unit;
+    offsets.push(copyHeight * ((columnIndex * 0.37) % 1));
+    velocities.push(0);
+    track.dataset.copyHeight = String(copyHeight);
+  });
+
+  let pointerX = 0;
+  let pointerY = 0;
+  let dampedX = 0;
+  let dampedY = 0;
+  let lastTimestamp = null;
+
+  driftWall.addEventListener("pointermove", (event) => {
+    if (reduced) return;
+    const rect = driftWall.getBoundingClientRect();
+    pointerX = (event.clientX - rect.left) / rect.width - 0.5;
+    pointerY = (event.clientY - rect.top) / rect.height - 0.5;
+  });
+
+  driftWall.addEventListener("pointerleave", () => {
+    pointerX = 0;
+    pointerY = 0;
+  });
+
+  const animate = (timestamp) => {
+    if (lastTimestamp === null) lastTimestamp = timestamp;
+    const delta = Math.min(0.05, Math.max(0, timestamp - lastTimestamp) / 1000);
+    lastTimestamp = timestamp;
+    const damping = 1 - Math.exp(-delta / 0.12);
+    dampedX += (pointerX * 4.8 - dampedX) * damping;
+    dampedY += (-pointerY * 4.8 - dampedY) * damping;
+    driftPlane.style.transform =
+      `translate(-50%, -50%) scale(1.16) rotateX(${10 + dampedY}deg) ` +
+      `rotateY(${-10 + dampedX}deg) translateZ(-90px)`;
+
+    tracks.forEach((track, columnIndex) => {
+      const copyHeight = Number(track.dataset.copyHeight);
+      if (!reduced) {
+        velocities[columnIndex] += (baseSpeeds[columnIndex] - velocities[columnIndex]) * (1 - Math.exp(-delta / 0.28));
+        offsets[columnIndex] =
+          ((offsets[columnIndex] + velocities[columnIndex] * delta) % copyHeight + copyHeight) % copyHeight;
+      }
+      track.style.transform = `translate3d(0, ${-offsets[columnIndex]}px, 0)`;
+    });
+
+    window.requestAnimationFrame(animate);
+  };
+
+  window.requestAnimationFrame(animate);
 };
 
 const pawSteps = [
@@ -238,7 +349,18 @@ const renderTapMessage = () => {
 };
 
 const advanceTapMessage = () => {
-  if (messageIsChanging || loadingScreen?.classList.contains("is-admiring")) return;
+  if (messageIsChanging || loadingScreen?.classList.contains("is-gallery")) return;
+
+  if (loadingScreen?.classList.contains("is-admiring")) {
+    if (!admirationLetterWrap?.classList.contains("is-complete")) return;
+
+    loadingScreen.classList.add("is-gallery", "is-complete");
+    loadingScreen.setAttribute("aria-label", "Drifting wall of memories");
+    admirationScene?.setAttribute("aria-hidden", "true");
+    memoriesScene?.setAttribute("aria-hidden", "false");
+    startDriftWall();
+    return;
+  }
 
   if (loadingScreen?.classList.contains("is-loving")) {
     if (!loveLetterWrap?.classList.contains("is-complete")) return;

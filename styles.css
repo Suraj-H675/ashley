@@ -119,6 +119,118 @@ body {
   transition: opacity 650ms ease-out, visibility 650ms;
 }
 
+.memories-scene {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+  overflow: hidden;
+  visibility: hidden;
+  background: #130e10;
+  opacity: 0;
+  transition: opacity 700ms ease-out, visibility 700ms;
+}
+
+.loading-screen.is-gallery .memories-scene {
+  visibility: visible;
+  opacity: 1;
+}
+
+.drift-wall {
+  --dw-tile-w: 8.25rem;
+  --dw-tile-h: 11.125rem;
+  --dw-gap: 0.75rem;
+  --dw-radius: 0.85rem;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  perspective: 1000px;
+  perspective-origin: 50% 50%;
+  touch-action: pan-y;
+  -webkit-mask-image: radial-gradient(ellipse 92% 88% at 50% 48%, #000 46%, transparent 100%);
+  mask-image: radial-gradient(ellipse 92% 88% at 50% 48%, #000 46%, transparent 100%);
+}
+
+.drift-wall__plane {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: row;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.drift-wall__col {
+  position: relative;
+  width: calc(var(--dw-tile-w) + var(--dw-gap));
+  flex: 0 0 auto;
+  transform-style: preserve-3d;
+}
+
+.drift-wall__track {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.drift-wall__tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: calc(var(--dw-tile-h) + var(--dw-gap));
+  flex: 0 0 auto;
+  outline: none;
+  transform-style: preserve-3d;
+}
+
+.drift-wall__inner {
+  position: absolute;
+  inset: calc(var(--dw-gap) / 2);
+  display: block;
+  overflow: hidden;
+  border-radius: var(--dw-radius);
+  background: #21171a;
+  box-shadow: 0 0.6rem 1.4rem rgb(0 0 0 / 32%);
+  opacity: 0.8;
+  transform: translateZ(0);
+  pointer-events: none;
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms, box-shadow 420ms;
+}
+
+.drift-wall__tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.9);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.drift-wall__overlay {
+  position: absolute;
+  inset: 0;
+  background: #28191c;
+  opacity: 0.25;
+  transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.drift-wall__tile:hover .drift-wall__inner,
+.drift-wall__tile:focus-visible .drift-wall__inner {
+  z-index: 1;
+  opacity: 1;
+  box-shadow: 0 1.5rem 3rem -1rem rgb(0 0 0 / 72%);
+  transform: translateZ(3.5rem);
+}
+
+.drift-wall__tile:hover .drift-wall__overlay,
+.drift-wall__tile:focus-visible .drift-wall__overlay {
+  opacity: 0;
+}
+
 .birthday-scene__letter {
   position: absolute;
   z-index: 1;
@@ -519,7 +631,8 @@ body {
   .love-scene,
   .love-scene__art,
   .admiration-scene,
-  .admiration-scene__art {
+  .admiration-scene__art,
+  .memories-scene {
     transition: none;
   }
 
@@ -539,5 +652,10 @@ body {
     opacity: 1;
     animation: none;
     transform: translate(-50%, 0);
+  }
+
+  .drift-wall__plane,
+  .drift-wall__track {
+    will-change: auto;
   }
 }
